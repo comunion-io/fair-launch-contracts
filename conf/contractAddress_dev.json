@@ -1,0 +1,38 @@
+[
+  {
+    "name": "WEFairFactory",
+    "abiUrl": "/artifacts/contracts/WEFairFactory.sol/WEFairFactory.json",
+    "addresses": [
+      {
+        "chainId": 80001,
+        "chainName": "Mumbai",
+        "address": ""
+      },
+      {
+        "chainId": 43113,
+        "chainName": "Avax Testnet",
+        "address": ""
+      },
+      {
+        "chainId": 1101,
+        "chainName": "Polygon zkEVM",
+        "address": ""
+      },
+      {
+        "chainId": 204,
+        "chainName": "opBNB",
+        "address": ""
+      },
+      {
+        "chainId": 57000,
+        "chainName": "Rollux testnet",
+        "address": "0x15dfA438696cc3375725590095E7C0641e8Fe995"
+      }
+    ]
+  },
+  {
+    "name": "WEFair",
+    "abiUrl": "/artifacts/contracts/WEFair.sol/WEFair.json",
+    "addresses": []
+  }
+]
