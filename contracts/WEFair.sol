@@ -14,7 +14,6 @@ struct Parameters {
     uint256 maxInvest;
     uint256 softCap;
     address router;
-    uint256 dexInitPrice;
     uint256 startedAt;
     uint256 endedAt;
     uint24 investTokenDecimals;
@@ -41,30 +40,30 @@ contract WEFair is Ownable, EIP712 {
     mapping(address => uint256) private investBalances;
     mapping(address => uint256) private claimed;
 
-    event ParticipantDivest(
+    event ParticipantDivestF(
         address _sender,
         uint256 _amount,
         uint256 _timestamp
     );
-    event FounderDivest(address _sender, uint256 _amount, uint256 _timestamp);
-    event Invest(address _sender, uint256 _amount, uint256 _timestamp);
+    event FounderDivestF(address _sender, uint256 _amount, uint256 _timestamp);
+    event InvestF(address _sender, uint256 _amount, uint256 _timestamp);
     // event ClaimInvest(address _sender, uint256 _amount, uint256 _timestamp);
-    event ClaimPresale(address _sender, uint256 _amount, uint256 _timestamp);
-    event CancelFounderReturn(
+    event ClaimPresaleF(address _sender, uint256 _amount, uint256 _timestamp);
+    event CancelFounderReturnF(
         address _sender,
         uint256 _amount,
         uint256 _timestamp
     );
-    event CancelReturn(address _sender, uint256 _amount, uint256 _timestamp);
-    event Cancel(uint256 _timestamp);
-    event TransferLP(
+    event CancelReturnF(address _sender, uint256 _amount, uint256 _timestamp);
+    event CancelF(uint256 _timestamp);
+    event TransferLPF(
         address _sender,
         address _router,
         uint256 _amountA,
         uint256 _amountB,
         uint256 _timestamp
     );
-    event UpdateEndedAt(uint256 _timestamp);
+    event UpdateEndedAtF(uint256 _timestamp);
 
     uint private unlocked = 0;
 
@@ -106,7 +105,7 @@ contract WEFair is Ownable, EIP712 {
         }
         parameters.endedAt = _endedAt;
         canUpdate = false;
-        emit UpdateEndedAt(_endedAt);
+        emit UpdateEndedAtF(_endedAt);
     }
 
     // Investment, allowing everyone to invest within the set limits
@@ -118,7 +117,7 @@ contract WEFair is Ownable, EIP712 {
         uint256 _senderTotalInvest = investBalances[_msgSender()].add(
             investAmount
         );
-        if (_senderTotalInvest > parameters.maxInvest) {
+        if (parameters.maxInvest > 0 && _senderTotalInvest > parameters.maxInvest) {
             revert GTMaximumInvestment();
         }
 
@@ -142,7 +141,7 @@ contract WEFair is Ownable, EIP712 {
             investAmount
         );
         totalInvest = totalInvest.add(investAmount);
-        emit Invest(_msgSender(), investAmount, block.timestamp);
+        emit InvestF(_msgSender(), investAmount, block.timestamp);
     }
 
     // Investors’ normal or emergency withdrawal of capital
@@ -264,8 +263,8 @@ contract WEFair is Ownable, EIP712 {
         //     _investTransferTeamAmount,
         //     block.timestamp
         // );
-        emit ClaimPresale(_msgSender(), returnPresaleAmount, block.timestamp);
-        emit TransferLP(
+        emit ClaimPresaleF(_msgSender(), returnPresaleAmount, block.timestamp);
+        emit TransferLPF(
             _msgSender(),
             parameters.router,
             amountA,
@@ -311,7 +310,7 @@ contract WEFair is Ownable, EIP712 {
         if (canClaim > 0) {
             claimed[_msgSender()] = canClaimTotal;
             _claimPresaleAmount(_msgSender(), canClaim);
-            emit ClaimPresale(_msgSender(), canClaim, block.timestamp);
+            emit ClaimPresaleF(_msgSender(), canClaim, block.timestamp);
         }
     }
 
@@ -341,8 +340,8 @@ contract WEFair is Ownable, EIP712 {
         }
         isCancel = true;
         _claimPresaleAmount(_msgSender(), totalPresale);
-        emit Cancel(block.timestamp);
-        emit CancelFounderReturn(_msgSender(), totalPresale, block.timestamp);
+        emit CancelF(block.timestamp);
+        emit CancelFounderReturnF(_msgSender(), totalPresale, block.timestamp);
     }
 
     // Obtain the investment token for transferring liquidity and the number of pre-sale tokens
@@ -396,7 +395,7 @@ contract WEFair is Ownable, EIP712 {
         _claimInvestAmount(_msgSender(), _balance);
         if (!_isCancel()) {
             totalInvest = totalInvest.sub(_balance);
-            emit ParticipantDivest(_msgSender(), _balance, block.timestamp);
+            emit ParticipantDivestF(_msgSender(), _balance, block.timestamp);
         }
     }
 
@@ -416,7 +415,7 @@ contract WEFair is Ownable, EIP712 {
         _claimInvestAmount(feeTo, _fee);
 
         _claimInvestAmount(_msgSender(), returnInvest);
-        emit ParticipantDivest(_msgSender(), returnInvest, block.timestamp);
+        emit ParticipantDivestF(_msgSender(), returnInvest, block.timestamp);
     }
 
     // promoter divestment
@@ -428,7 +427,7 @@ contract WEFair is Ownable, EIP712 {
             return;
         }
         _claimPresaleAmount(_msgSender(), _presaleTokenAmunt);
-        emit FounderDivest(_msgSender(), totalPresale, block.timestamp);
+        emit FounderDivestF(_msgSender(), totalPresale, block.timestamp);
     }
 
     // Claim investment token
